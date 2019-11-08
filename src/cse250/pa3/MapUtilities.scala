@@ -36,13 +36,13 @@ object  MapUtilities {
     for(way <- deWay){
        for(tag <- way \ "tag"){
          if((tag \ "@k").text == "tiger:name_base"){
-           for(ref <- way \ "@ref"){
+           for(ref <- way \\ "@ref"){
              val id: String = ref.toString()
              if(deMap.contains(id)){
-               deMap(id).add((tag \ "@v").toString())
+               deMap(id) += (tag \ "@v").toString()
              }
              else{
-               deMap.addOne(id, mutable.Set((tag \ "@v").toString()))
+               deMap += (id -> mutable.Set((tag \ "@v").toString()))
              }
            }
          }
@@ -54,6 +54,7 @@ object  MapUtilities {
   def buildIntersectionGraph(intersectionIDs: mutable.Set[String],
                              nodeToStreetMapping: mutable.Map[String, mutable.Set[String]]): StreetGraph = {
     val streetGraph = new StreetGraph
+
     streetGraph
   }
 
