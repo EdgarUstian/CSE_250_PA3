@@ -54,7 +54,16 @@ object  MapUtilities {
   def buildIntersectionGraph(intersectionIDs: mutable.Set[String],
                              nodeToStreetMapping: mutable.Map[String, mutable.Set[String]]): StreetGraph = {
     val streetGraph = new StreetGraph
-
+    for((id, streets) <- nodeToStreetMapping){
+      if(intersectionIDs.contains(id)){
+        if(streets.size > 1){
+          streets.foreach{street =>
+            streetGraph.insertVertex(street)
+            streets.foreach(road => if(street != road) streetGraph.insertEdge(street, road))
+          }
+        }
+      }
+    }
     streetGraph
   }
 

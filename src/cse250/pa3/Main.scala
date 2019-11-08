@@ -23,10 +23,10 @@ object Main {
     val intersectionIDs = MapUtilities.loadIntersectionIDs(intersectionNodeXMLFile)
 //    intersectionIDs.foreach(id => println(id))
     val nodeToStreetMapping = MapUtilities.loadMapInfo(mapXMLFile)
-    nodeToStreetMapping.keys.foreach{id =>
+    /*nodeToStreetMapping.keys.foreach{id =>
       println("ID : " + id + " Streets : " + nodeToStreetMapping(id))
-    }
-//    val streetGraph = MapUtilities.buildIntersectionGraph(intersectionIDs, nodeToStreetMapping)
+    }*/
+    val streetGraph = MapUtilities.buildIntersectionGraph(intersectionIDs, nodeToStreetMapping)
     println(s"${entries(1)} to\n${entries(2)}")
 //    println(MapUtilities.computeFewestTurns(streetGraph, entries(1), entries(2)))
 //    println(MapUtilities.computeFewestTurnsList(streetGraph, entries(1), entries(2)))
