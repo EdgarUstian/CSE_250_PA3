@@ -27,15 +27,23 @@ object Main {
       println("ID: " + id + " ---" + " Streets: " + nodeToStreetMapping(id))
     }*/
     val streetGraph = MapUtilities.buildIntersectionGraph(intersectionIDs, nodeToStreetMapping)
-//    println(s"${entries(1)} to\n${entries(2)}")
+//    streetGraph.edges.foreach(edge => println(edge))
+//    println(s"${entries(1).infoMap("STREET")} to ${entries(2).infoMap("STREET")}")
 //    println(MapUtilities.computeFewestTurns(streetGraph, entries(1), entries(2)))
 //    println(MapUtilities.computeFewestTurnsList(streetGraph, entries(1), entries(2)))
 
-    println(s"${entries(3)} to\n${entries(24)}")
-    println(MapUtilities.computeFewestTurns(streetGraph, entries(3), entries(24)))
+//    println(s"${entries(3).infoMap("STREET")} to\n${entries(24).infoMap("STREET")}")
+//    println(MapUtilities.computeFewestTurns(streetGraph, entries(3), entries(24)))
 //    println(MapUtilities.computeFewestTurnsList(streetGraph, entries(3), entries(24)))
 
-
+    entries.foreach{entry1 =>
+      entries.foreach{entry2 =>
+        println("-------------------")
+        println(entry1.infoMap("STREET") + " --> " + entry2.infoMap("STREET"))
+        println(MapUtilities.computeFewestTurns(streetGraph, entry1, entry2))
+        println(MapUtilities.computeFewestTurnsList(streetGraph, entry1, entry2))
+      }
+    }
   }
 }
 
