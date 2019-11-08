@@ -39,10 +39,10 @@ object  MapUtilities {
            for(ref <- way \\ "@ref"){
              val id: String = ref.toString()
              if(deMap.contains(id)){
-               deMap(id) += (tag \ "@v").toString()
+               deMap(id).addOne((tag \ "@v").toString())
              }
              else{
-               deMap += (id -> mutable.Set((tag \ "@v").toString()))
+               deMap.addOne(id -> mutable.Set((tag \ "@v").toString()))
              }
            }
          }
@@ -67,11 +67,50 @@ object  MapUtilities {
     streetGraph
   }
 
+  def pathWay(streetGraph: StreetGraph, start: TaxEntry, end: TaxEntry): Map[Int, Seq[String]] = {
+    val startID = start.infoMap("STREET")
+    val endID = end.infoMap("STREET")
+    println(startID + " --> " + endID)
+    var visited: Set[String] = Set(startID)
+    val explored: mutable.Map[String, String] = mutable.Map[String, String](
+      startID -> "Start"
+    )
+    val guests: mutable.Queue[String] = mutable.Queue()
+    guests.enqueue(startID)
+
+    while(guests.nonEmpty){
+      val nextNode = guests.dequeue()
+      //      println(nextNode)
+      streetGraph.edges.foreach{edge =>
+        if(nextNode.toUpperCase == edge._1.toUpperCase){
+          //          println(edge._1, edge._2)
+          if(!visited.contains(edge._2)){
+            //            println("exploring: " + edge._2)
+            //            println(edge._1, edge._2)
+            explored += (edge._2 -> nextNode)
+            guests.enqueue(edge._2)
+            visited += edge._2
+          }
+        }
+      }
+    }
+//    println(visited)
+//    explored.foreach(street => println(street._1 + " -> " + street._2))
+
+    var path: Seq[String] = Seq()
+
+
+
+    val ret: Map[Int, Seq[String]] = Map(1 -> Seq("1"))
+    ret
+  }
+
+
   def computeFewestTurns(streetGraph: StreetGraph, start: TaxEntry, end: TaxEntry): Int = {
-    -1
+    pathWay(streetGraph, start, end).head._1
   }
 
   def computeFewestTurnsList(streetGraph: StreetGraph, start: TaxEntry, end: TaxEntry): Seq[String] = {
-    List()
+    pathWay(streetGraph, start, end).head._2
   }
 }
