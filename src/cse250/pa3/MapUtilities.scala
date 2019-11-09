@@ -20,6 +20,7 @@ package cse250.pa3
 import cse250.objects.{StreetGraph, TaxEntry}
 import scala.collection.mutable
 import scala.xml.{NodeSeq, XML}
+import scala.util.control.Breaks
 
 object  MapUtilities {
   def loadIntersectionIDs(filename: String): mutable.Set[String] = {
@@ -54,12 +55,10 @@ object  MapUtilities {
                              nodeToStreetMapping: mutable.Map[String, mutable.Set[String]]): StreetGraph = {
     val streetGraph = new StreetGraph
     for((id, streets) <- nodeToStreetMapping){
-      if(intersectionIDs.contains(id)){
-        if(streets.size > 1){
-          streets.foreach{street =>
+      if(intersectionIDs.contains(id) && streets.size > 1){
+        streets.foreach{street =>
 //            streetGraph.insertVertex(street)
-            streets.foreach(road => if(street != road) streetGraph.insertEdge(street, road))
-          }
+          streets.foreach(road => if(street != road) streetGraph.insertEdge(street, road))
         }
       }
     }
@@ -68,71 +67,58 @@ object  MapUtilities {
 
   def pathWay(streetGraph: StreetGraph, start: TaxEntry, end: TaxEntry): mutable.Seq[String] = {
     var path: mutable.Seq[String] = mutable.Seq()
-    //PART 1:
-    //Creates the BFS map from starting location
-    val startID = start.infoMap("STREET")
-    val endID = end.infoMap("STREET")
-//    println(startID + " --> " + endID)
-    var visited: Set[String] = Set(startID)
-    val explored: mutable.Map[String, String] = mutable.Map[String, String](
-        startID -> "StartNode"
-    )
-    val guests: mutable.Queue[String] = mutable.Queue()
-    guests.enqueue(startID)
-
-    //start or end not in streetGraph
-    if(streetGraph.vertices.contains(startID) && streetGraph.vertices.contains(endID)){
-      var explore: Boolean = true
-      while(guests.nonEmpty){
-        val nextNode: String = guests.dequeue()
-        //      println(nextNode)
-        streetGraph.edges.foreach{edge =>
-          if(nextNode.toUpperCase == edge._1.toUpperCase){
-            //          println(edge._1, edge._2)
-            if(!visited.contains(edge._2) && explore){
-              //            println("exploring: " + edge._2)
-              //            println(edge._1, edge._2)
-              explored += (edge._2 -> nextNode)
-              guests.enqueue(edge._2)
-              visited += edge._2
-            }
-            if(edge._2 == endID){
-              guests.empty
-              explore = false
-            }
+    //Check if TaxEntry in vertices
+    if(start.infoMap("STREET") == end.infoMap("STREET")){
+//      println("Same")
+      path = path :+ start.infoMap("STREET")
+      path
+    }
+    else if(streetGraph.vertices.contains(start.infoMap("STREET")) && streetGraph.vertices.contains(end.infoMap("STREET"))){
+      //Create respective Vertex for start && end
+      val startGame: streetGraph.Vertex = streetGraph.vertices(start.infoMap("STREET"))
+      val endGame: streetGraph.Vertex =streetGraph.vertices(end.infoMap("STREET"))
+      //Create variables to store
+      var vIterator: streetGraph.Vertex = null
+      var toExplore: mutable.Queue[streetGraph.Vertex] = mutable.Queue(startGame)
+      var explored: mutable.Set[streetGraph.Vertex] = mutable.Set(startGame)
+      var map: mutable.Map[streetGraph.Vertex, streetGraph.Vertex] = mutable.Map(
+        startGame -> null
+      )
+      var found: Boolean = false
+      while(!found && toExplore.nonEmpty){
+        val nodeExplore: streetGraph.Vertex = toExplore.dequeue()
+        nodeExplore.edges.foreach{vertex =>
+          if(vertex == endGame){
+            map += (vertex -> nodeExplore)
+            found = true
+            vIterator = vertex
+          }
+          else if(!found && !explored.contains(vertex)){
+            toExplore.enqueue(vertex)
+            explored += vertex
+            map += (vertex -> nodeExplore)
           }
         }
       }
-      //    println(visited)
-      //    explored.foreach(street => println(street._1 + " -> " + street._2))
-
-      //PART 2:
-      //Creates a traversable path if possible
-      //start or end in streetGraph but no path
-      if(explored.contains(endID)){
-//        println("Contains")
-        path = path :+ endID
-        var prev = explored(endID)
-        while(prev != "StartNode"){
-          path = path :+ prev
-          prev = explored(prev)
+      if(found){
+//        println("Found")
+        while(map(vIterator) != null){
+          //          println(map(vIterator))
+          path = path :+ vIterator.name
+          vIterator = map(vIterator)
         }
-        path = path.reverse
+        path = path :+ vIterator.name
+        path.reverse
       }
       else{
 //        println("No Path")
-        path = mutable.Seq()
+        path
       }
     }
-    else if(start == end){
-//      println("Not in graph / same")
-      path = mutable.Seq(startID)
-    }
     else{
-//      println("Not in graph / not same")
-      path = mutable.Seq()
+//      println("Not in Graph / Not Same")
+      path
     }
-    path
   }
 
 
