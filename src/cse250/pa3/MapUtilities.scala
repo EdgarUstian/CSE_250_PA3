@@ -20,7 +20,6 @@ package cse250.pa3
 import cse250.objects.{StreetGraph, TaxEntry}
 import scala.collection.mutable
 import scala.xml.{NodeSeq, XML}
-import scala.util.control.Breaks
 
 object  MapUtilities {
   def loadIntersectionIDs(filename: String): mutable.Set[String] = {
