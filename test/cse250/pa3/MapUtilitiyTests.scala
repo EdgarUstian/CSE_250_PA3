@@ -42,7 +42,7 @@ class MapUtilitiyTests extends FlatSpec with BeforeAndAfter {
   behavior of "FewestTurns"
   it should "complete this task efficiently" in {
     val graph = new StreetGraph
-    val upper = 10000
+    val upper = 20000
     for (i <- 0 until upper)
       for (j <- 1 to upper/20) {
         graph.insertEdge(i.toString,(i+j).toString)
